@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 const packages = [
   {
     name: "Silver",
-    price: "$2,999",
+    price: "₹2,49,000",
     description: "Perfect for intimate gatherings and small celebrations",
     features: [
       "Up to 50 guests",
@@ -24,7 +24,7 @@ const packages = [
   },
   {
     name: "Gold",
-    price: "$6,999",
+    price: "₹5,81,000",
     description: "Ideal for medium-sized events with premium features",
     features: [
       "Up to 150 guests",
@@ -41,7 +41,7 @@ const packages = [
   },
   {
     name: "Platinum VIP",
-    price: "$15,999+",
+    price: "₹13,29,000+",
     description: "The ultimate luxury experience for grand celebrations",
     features: [
       "Unlimited guests",
