@@ -3,9 +3,6 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { Section, Card } from "@/components/ui/animated-components";
 import { Star, Play } from "lucide-react";
-import videoCorporate from "@/assets/video-corporate.jpg";
-import videoBirthday from "@/assets/video-birthday.jpg";
-import videoWedding from "@/assets/video-wedding.jpg";
 
 const testimonials = [
   {
@@ -47,35 +44,22 @@ const Testimonials = () => {
         </div>
       </section>
 
-      {/* Video Testimonials */}
+      {/* Video Testimonials Placeholder */}
       <Section className="pb-12">
         <div className="container mx-auto px-4">
           <h2 className="font-heading text-3xl font-bold text-foreground mb-8 text-center">
             Video Testimonials
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              { id: 1, title: "Corporate Event Success", image: videoCorporate },
-              { id: 2, title: "Birthday Celebration", image: videoBirthday },
-              { id: 3, title: "Wedding Dreams Come True", image: videoWedding }
-            ].map((video) => (
-              <Card key={video.id} className="group cursor-pointer overflow-hidden hover-scale">
-                <div className="relative aspect-video rounded-xl overflow-hidden">
-                  <img 
-                    src={video.image} 
-                    alt={video.title}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  />
+            {[1, 2, 3].map((idx) => (
+              <Card key={idx} className="group cursor-pointer overflow-hidden">
+                <div className="relative aspect-video bg-muted/20 rounded-xl overflow-hidden flex items-center justify-center">
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-primary/90 flex items-center justify-center group-hover:scale-110 transition-transform glow-gold">
-                      <Play className="w-10 h-10 text-primary-foreground ml-1" fill="currentColor" />
-                    </div>
-                  </div>
+                  <Play className="w-16 h-16 text-primary group-hover:scale-110 transition-transform z-10" />
                 </div>
                 <div className="mt-4">
-                  <p className="font-sub font-semibold text-foreground">
-                    {video.title}
+                  <p className="font-sub text-sm text-muted-foreground">
+                    Client Testimonial {idx}
                   </p>
                 </div>
               </Card>

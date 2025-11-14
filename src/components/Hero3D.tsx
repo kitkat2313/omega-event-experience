@@ -5,22 +5,22 @@ import * as THREE from "three";
 
 // Glass Shattering Cube Component
 const GlassShatteringCube = () => {
-  const count = 200;
+  const count = 120;
   const mesh = useRef<THREE.InstancedMesh>(null);
   const mainCubeRef = useRef<THREE.Mesh>(null);
 
   const particles = useMemo(() => {
     const temp = [];
-    const colors = ["#2a2a2a", "#f5f5f5", "#0a0a0a"]; // ash, white, deep charcoal
+    const colors = ["#1a1a1a", "#ffffff", "#4a4a4a"]; // ash, white, black
     
     for (let i = 0; i < count; i++) {
       // Random direction for explosion
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos((Math.random() * 2) - 1);
-      const speed = 1.2 + Math.random() * 2;
-      const distance = 3 + Math.random() * 6;
-      const size = 0.06 + Math.random() * 0.2;
-      const rotationSpeed = (Math.random() - 0.5) * 0.4;
+      const speed = 0.8 + Math.random() * 1.2;
+      const distance = 2 + Math.random() * 4;
+      const size = 0.08 + Math.random() * 0.15;
+      const rotationSpeed = (Math.random() - 0.5) * 0.2;
       const color = colors[Math.floor(Math.random() * colors.length)];
       
       temp.push({ 
@@ -31,7 +31,7 @@ const GlassShatteringCube = () => {
         size,
         rotationSpeed,
         color,
-        delay: Math.random() * 0.2,
+        delay: Math.random() * 0.3,
       });
     }
     return temp;
@@ -89,32 +89,24 @@ const GlassShatteringCube = () => {
   return (
     <>
       {/* Main Cube */}
-      <mesh ref={mainCubeRef} position={[0, 0, 0]} castShadow>
-        <boxGeometry args={[2.5, 2.5, 2.5]} />
-        <meshPhysicalMaterial 
-          color="#d0d0d0" 
-          metalness={0.9} 
-          roughness={0.1}
+      <mesh ref={mainCubeRef} position={[0, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial 
+          color="#e0e0e0" 
+          metalness={0.7} 
+          roughness={0.3}
           transparent
-          opacity={0.95}
-          transmission={0.1}
-          thickness={0.5}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-          envMapIntensity={1.5}
+          opacity={0.9}
         />
       </mesh>
       
       {/* Shattered Pieces */}
-      <instancedMesh ref={mesh} args={[undefined, undefined, count]} castShadow receiveShadow>
-        <boxGeometry args={[0.15, 0.15, 0.15]} />
-        <meshPhysicalMaterial 
-          color="#b0b0b0" 
-          metalness={0.85} 
-          roughness={0.15}
-          clearcoat={0.8}
-          clearcoatRoughness={0.2}
-          envMapIntensity={1.2}
+      <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+        <boxGeometry args={[0.2, 0.2, 0.2]} />
+        <meshStandardMaterial 
+          color="#cccccc" 
+          metalness={0.6} 
+          roughness={0.4}
         />
       </instancedMesh>
     </>
@@ -238,7 +230,6 @@ const AnimatedSpotlights = () => {
   const spotlight1 = useRef<THREE.SpotLight>(null);
   const spotlight2 = useRef<THREE.SpotLight>(null);
   const spotlight3 = useRef<THREE.SpotLight>(null);
-  const spotlight4 = useRef<THREE.SpotLight>(null);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -257,11 +248,6 @@ const AnimatedSpotlights = () => {
       spotlight3.current.position.x = Math.sin(t * 0.3 + 4) * 6;
       spotlight3.current.position.z = Math.cos(t * 0.3 + 4) * 2;
     }
-    
-    if (spotlight4.current) {
-      spotlight4.current.position.x = Math.sin(t * 0.4 + 1) * 3;
-      spotlight4.current.position.z = Math.cos(t * 0.4 + 1) * 5;
-    }
   });
 
   return (
@@ -269,46 +255,30 @@ const AnimatedSpotlights = () => {
       <spotLight
         ref={spotlight1}
         position={[3, 8, 2]}
-        angle={0.3}
-        penumbra={0.4}
-        intensity={200}
+        angle={0.4}
+        penumbra={0.5}
+        intensity={150}
         color="#D4AF37"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
         target-position={[0, 0, 0]}
       />
       <spotLight
         ref={spotlight2}
         position={[-3, 8, 2]}
-        angle={0.3}
-        penumbra={0.4}
-        intensity={180}
+        angle={0.4}
+        penumbra={0.5}
+        intensity={120}
         color="#ffffff"
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
         target-position={[0, 0, 0]}
       />
       <spotLight
         ref={spotlight3}
         position={[0, 10, -2]}
-        angle={0.4}
-        penumbra={0.5}
-        intensity={150}
-        color="#800020"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        target-position={[0, 0, 0]}
-      />
-      <spotLight
-        ref={spotlight4}
-        position={[0, 12, 3]}
         angle={0.5}
         penumbra={0.6}
-        intensity={120}
-        color="#ffffff"
+        intensity={100}
+        color="#800020"
         castShadow
         target-position={[0, 0, 0]}
       />
@@ -322,28 +292,24 @@ const Scene = () => {
     <>
       {/* Lights */}
       <AnimatedSpotlights />
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 10, 5]} intensity={1.5} color="#ffffff" castShadow />
-      <pointLight position={[10, 10, 10]} intensity={1.5} color="#D4AF37" />
-      <pointLight position={[-10, -10, -10]} intensity={1.0} color="#8B0000" />
-      <pointLight position={[0, 5, 5]} intensity={0.8} color="#FFD700" />
-      <pointLight position={[-5, 8, -5]} intensity={1.2} color="#C0C0C0" />
+      <ambientLight intensity={0.3} />
+      <pointLight position={[10, 10, 10]} intensity={1.2} color="#D4AF37" />
+      <pointLight position={[-10, -10, -10]} intensity={0.8} color="#8B0000" />
+      <pointLight position={[0, 5, 5]} intensity={0.6} color="#FFD700" />
 
       {/* 3D Elements */}
       <GlassShatteringCube />
       <Stage />
       
       <Sparkles
-        count={300}
-        scale={18}
-        size={2.5}
-        speed={0.2}
+        count={200}
+        scale={15}
+        size={2}
+        speed={0.3}
         color="#D4AF37"
-        opacity={0.6}
       />
 
       <Environment preset="night" />
-      <fog attach="fog" args={['#000000', 10, 30]} />
       
       <OrbitControls
         enableZoom={false}
@@ -351,7 +317,7 @@ const Scene = () => {
         maxPolarAngle={Math.PI / 2}
         minPolarAngle={Math.PI / 3}
         autoRotate
-        autoRotateSpeed={0.3}
+        autoRotateSpeed={0.5}
       />
     </>
   );
@@ -385,13 +351,13 @@ export const Hero3D = () => {
       {/* Overlay Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
         <div className="text-center space-y-6 px-4">
-          <h1 className="font-heading text-2xl md:text-4xl lg:text-5xl font-bold text-gradient-gold animate-fade-in">
+          <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-gradient-gold animate-fade-in">
             We Make Your Celebrations
           </h1>
-          <h2 className="font-heading text-xl md:text-3xl lg:text-4xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
             Truly Unforgettable
           </h2>
-          <p className="font-sub text-base md:text-lg text-muted-foreground animate-fade-in" style={{ animationDelay: "0.4s" }}>
+          <p className="font-sub text-lg md:text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.4s" }}>
             Premium Event Planners
           </p>
           <div className="pt-8 pointer-events-auto animate-fade-up" style={{ animationDelay: "0.6s" }}>
