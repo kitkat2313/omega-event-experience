@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Luxury Dark Theme - Omega Event Management */
+    --background: 0 0% 5.5%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Champagne Gold Accent */
+    --primary: 43 65% 53%;
+    --primary-foreground: 0 0% 5.5%;
+
+    /* Royal Burgundy */
+    --secondary: 345 75% 25%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+
+    --accent: 43 65% 53%;
+    --accent-foreground: 0 0% 5.5%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 15%;
+    --ring: 43 65% 53%;
+
+    --radius: 1rem;
+
+    /* Custom Luxury Tokens */
+    --gold-glow: 43 90% 70%;
+    --burgundy-deep: 345 80% 20%;
+    --glass-bg: 0 0% 10%;
+    --glass-border: 0 0% 25%;
+
+    /* Typography */
+    --font-heading: 'Montserrat', sans-serif;
+    --font-sub: 'Poppins', sans-serif;
+    --font-body: 'Open Sans', sans-serif;
+
+    /* Effects */
+    --glow-sm: 0 0 10px hsl(var(--primary) / 0.3);
+    --glow-md: 0 0 20px hsl(var(--primary) / 0.4);
+    --glow-lg: 0 0 30px hsl(var(--primary) / 0.5);
+    
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  p {
+    font-family: var(--font-body);
+  }
+}
+
+@layer utilities {
+  /* Glassmorphism */
+  .glass {
+    background: rgba(var(--glass-bg) / 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  .glass-strong {
+    background: rgba(var(--glass-bg) / 0.7);
+    backdrop-filter: blur(30px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  /* Gold Glow Effects */
+  .glow-gold {
+    box-shadow: var(--glow-md);
+  }
+
+  .glow-gold-strong {
+    box-shadow: var(--glow-lg);
+  }
+
+  /* Text gradients */
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--gold-glow)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-bounce {
+    transition: var(--transition-bounce);
+  }
+
+  /* 3D tilt effect base */
+  .tilt-card {
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .tilt-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--gold-glow));
+}
