@@ -3,28 +3,35 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sparkles, Environment } from "@react-three/drei";
 import * as THREE from "three";
 
-// Scattering Cubes Component
-const ScatteringCubes = () => {
-  const count = 80;
+// Glass Shattering Cube Component
+const GlassShatteringCube = () => {
+  const count = 120;
   const mesh = useRef<THREE.InstancedMesh>(null);
+  const mainCubeRef = useRef<THREE.Mesh>(null);
 
   const particles = useMemo(() => {
     const temp = [];
+    const colors = ["#1a1a1a", "#ffffff", "#4a4a4a"]; // ash, white, black
+    
     for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2;
-      const radius = 2 + Math.random() * 3;
-      const speed = 0.5 + Math.random() * 1.5;
-      const size = 0.1 + Math.random() * 0.3;
-      const rotationSpeed = (Math.random() - 0.5) * 0.1;
+      // Random direction for explosion
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      const speed = 0.8 + Math.random() * 1.2;
+      const distance = 2 + Math.random() * 4;
+      const size = 0.08 + Math.random() * 0.15;
+      const rotationSpeed = (Math.random() - 0.5) * 0.2;
+      const color = colors[Math.floor(Math.random() * colors.length)];
       
       temp.push({ 
-        angle, 
-        radius, 
-        speed, 
+        theta,
+        phi,
+        speed,
+        distance,
         size,
         rotationSpeed,
-        y: (Math.random() - 0.5) * 4,
-        phase: Math.random() * Math.PI * 2,
+        color,
+        delay: Math.random() * 0.3,
       });
     }
     return temp;
@@ -36,22 +43,40 @@ const ScatteringCubes = () => {
     if (!mesh.current) return;
     const time = clock.getElapsedTime();
     
+    // Main animation cycle: 3 seconds total (1.5s shatter, 1.5s reform)
+    const cycle = (time % 4);
+    const isExploding = cycle < 2;
+    const progress = isExploding ? cycle / 2 : 1 - ((cycle - 2) / 2);
+    
+    // Main cube visibility and scale
+    if (mainCubeRef.current) {
+      mainCubeRef.current.visible = progress < 0.1 || progress > 0.9;
+      const scale = progress < 0.1 ? 1 - (progress * 10) : progress > 0.9 ? (progress - 0.9) * 10 : 0;
+      mainCubeRef.current.scale.setScalar(Math.max(0.01, scale));
+      mainCubeRef.current.rotation.x = time * 0.1;
+      mainCubeRef.current.rotation.y = time * 0.15;
+    }
+    
     particles.forEach((particle, i) => {
-      const { angle, radius, speed, size, rotationSpeed, y, phase } = particle;
+      const { theta, phi, distance, size, rotationSpeed, delay } = particle;
       
-      // Spiral outward motion
-      const currentRadius = radius + Math.sin(time * speed + phase) * 2;
-      const currentAngle = angle + time * speed * 0.3;
+      // Apply delay and smooth easing
+      const delayedProgress = Math.max(0, Math.min(1, (progress - delay) / (1 - delay)));
+      const eased = delayedProgress < 0.5 
+        ? 2 * delayedProgress * delayedProgress 
+        : 1 - Math.pow(-2 * delayedProgress + 2, 2) / 2;
       
-      const x = Math.cos(currentAngle) * currentRadius;
-      const z = Math.sin(currentAngle) * currentRadius;
-      const yPos = y + Math.sin(time * speed + phase) * 1.5;
+      const currentDistance = distance * eased;
       
-      dummy.position.set(x, yPos, z);
-      dummy.scale.setScalar(size);
+      const x = currentDistance * Math.sin(phi) * Math.cos(theta);
+      const y = currentDistance * Math.cos(phi);
+      const z = currentDistance * Math.sin(phi) * Math.sin(theta);
+      
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(size * (progress > 0.05 ? 1 : 0));
       dummy.rotation.set(
-        time * rotationSpeed,
-        time * rotationSpeed * 1.5,
+        time * rotationSpeed + eased * Math.PI * 2,
+        time * rotationSpeed * 1.5 + eased * Math.PI,
         time * rotationSpeed * 0.5
       );
       dummy.updateMatrix();
@@ -63,14 +88,25 @@ const ScatteringCubes = () => {
 
   return (
     <>
-      <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-        <boxGeometry args={[1, 1, 1]} />
+      {/* Main Cube */}
+      <mesh ref={mainCubeRef} position={[0, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
         <meshStandardMaterial 
-          color="#D4AF37" 
-          metalness={0.9} 
-          roughness={0.1}
-          emissive="#D4AF37"
-          emissiveIntensity={0.3}
+          color="#e0e0e0" 
+          metalness={0.7} 
+          roughness={0.3}
+          transparent
+          opacity={0.9}
+        />
+      </mesh>
+      
+      {/* Shattered Pieces */}
+      <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+        <boxGeometry args={[0.2, 0.2, 0.2]} />
+        <meshStandardMaterial 
+          color="#cccccc" 
+          metalness={0.6} 
+          roughness={0.4}
         />
       </instancedMesh>
     </>
@@ -262,8 +298,7 @@ const Scene = () => {
       <pointLight position={[0, 5, 5]} intensity={0.6} color="#FFD700" />
 
       {/* 3D Elements */}
-      <ScatteringCubes />
-      <ExplodingParticles />
+      <GlassShatteringCube />
       <Stage />
       
       <Sparkles
@@ -316,13 +351,13 @@ export const Hero3D = () => {
       {/* Overlay Content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
         <div className="text-center space-y-6 px-4">
-          <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl font-bold text-gradient-gold animate-fade-in">
+          <h1 className="font-heading text-3xl md:text-5xl lg:text-6xl font-bold text-gradient-gold animate-fade-in">
             We Make Your Celebrations
           </h1>
-          <h2 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
+          <h2 className="font-heading text-2xl md:text-4xl lg:text-5xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
             Truly Unforgettable
           </h2>
-          <p className="font-sub text-xl md:text-2xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.4s" }}>
+          <p className="font-sub text-lg md:text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.4s" }}>
             Premium Event Planners
           </p>
           <div className="pt-8 pointer-events-auto animate-fade-up" style={{ animationDelay: "0.6s" }}>
