@@ -3,47 +3,125 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sparkles, Environment } from "@react-three/drei";
 import * as THREE from "three";
 
-// Confetti Particles Component
-const Confetti = () => {
-  const count = 100;
+// Scattering Cubes Component
+const ScatteringCubes = () => {
+  const count = 80;
   const mesh = useRef<THREE.InstancedMesh>(null);
 
   const particles = useMemo(() => {
     const temp = [];
     for (let i = 0; i < count; i++) {
-      const t = Math.random() * 100;
-      const factor = 20 + Math.random() * 100;
-      const speed = 0.01 + Math.random() / 200;
-      const x = (Math.random() - 0.5) * 20;
-      const y = Math.random() * 10 + 5;
-      const z = (Math.random() - 0.5) * 20;
-
-      temp.push({ t, factor, speed, x, y, z, mx: 0, my: 0 });
+      const angle = (i / count) * Math.PI * 2;
+      const radius = 2 + Math.random() * 3;
+      const speed = 0.5 + Math.random() * 1.5;
+      const size = 0.1 + Math.random() * 0.3;
+      const rotationSpeed = (Math.random() - 0.5) * 0.1;
+      
+      temp.push({ 
+        angle, 
+        radius, 
+        speed, 
+        size,
+        rotationSpeed,
+        y: (Math.random() - 0.5) * 4,
+        phase: Math.random() * Math.PI * 2,
+      });
     }
     return temp;
   }, []);
 
   const dummy = useMemo(() => new THREE.Object3D(), []);
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     if (!mesh.current) return;
+    const time = clock.getElapsedTime();
+    
     particles.forEach((particle, i) => {
-      let { t, factor, speed, x, y, z } = particle;
-
-      t = particle.t += speed / 2;
-      const a = Math.cos(t) + Math.sin(t * 1) / 10;
-      const b = Math.sin(t) + Math.cos(t * 2) / 10;
-      const s = Math.cos(t);
-
-      dummy.position.set(
-        x + Math.cos((t / 10) * factor) + (Math.sin(t * 1) * factor) / 10,
-        y + Math.sin((t / 10) * factor) * 2,
-        z + Math.cos((t / 10) * factor) + (Math.sin(t * 2) * factor) / 10
+      const { angle, radius, speed, size, rotationSpeed, y, phase } = particle;
+      
+      // Spiral outward motion
+      const currentRadius = radius + Math.sin(time * speed + phase) * 2;
+      const currentAngle = angle + time * speed * 0.3;
+      
+      const x = Math.cos(currentAngle) * currentRadius;
+      const z = Math.sin(currentAngle) * currentRadius;
+      const yPos = y + Math.sin(time * speed + phase) * 1.5;
+      
+      dummy.position.set(x, yPos, z);
+      dummy.scale.setScalar(size);
+      dummy.rotation.set(
+        time * rotationSpeed,
+        time * rotationSpeed * 1.5,
+        time * rotationSpeed * 0.5
       );
-      dummy.scale.set(s, s, s);
-      dummy.rotation.set(s * 5, s * 5, s * 5);
       dummy.updateMatrix();
+      
+      mesh.current!.setMatrixAt(i, dummy.matrix);
+    });
+    mesh.current.instanceMatrix.needsUpdate = true;
+  });
 
+  return (
+    <>
+      <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial 
+          color="#D4AF37" 
+          metalness={0.9} 
+          roughness={0.1}
+          emissive="#D4AF37"
+          emissiveIntensity={0.3}
+        />
+      </instancedMesh>
+    </>
+  );
+};
+
+// Exploding Particles Component
+const ExplodingParticles = () => {
+  const count = 100;
+  const mesh = useRef<THREE.InstancedMesh>(null);
+
+  const particles = useMemo(() => {
+    const temp = [];
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI;
+      const speed = 0.5 + Math.random() * 2;
+      const size = 0.05 + Math.random() * 0.15;
+      
+      temp.push({ 
+        theta,
+        phi,
+        speed,
+        size,
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+    return temp;
+  }, []);
+
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+
+  useFrame(({ clock }) => {
+    if (!mesh.current) return;
+    const time = clock.getElapsedTime();
+    
+    particles.forEach((particle, i) => {
+      const { theta, phi, speed, size, phase } = particle;
+      
+      // Pulsing explosion effect
+      const pulseRadius = 1 + Math.abs(Math.sin(time * speed + phase)) * 4;
+      
+      const x = pulseRadius * Math.sin(phi) * Math.cos(theta);
+      const y = pulseRadius * Math.cos(phi);
+      const z = pulseRadius * Math.sin(phi) * Math.sin(theta);
+      
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(size * (1 + Math.sin(time * speed + phase) * 0.5));
+      dummy.rotation.set(time * 2, time * 3, time);
+      dummy.updateMatrix();
+      
       mesh.current!.setMatrixAt(i, dummy.matrix);
     });
     mesh.current.instanceMatrix.needsUpdate = true;
@@ -51,8 +129,14 @@ const Confetti = () => {
 
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, count]}>
-      <boxGeometry args={[0.1, 0.1, 0.02]} />
-      <meshStandardMaterial color="#D4AF37" metalness={0.8} roughness={0.2} />
+      <boxGeometry args={[0.1, 0.1, 0.1]} />
+      <meshStandardMaterial 
+        color="#8B0000" 
+        metalness={0.8} 
+        roughness={0.2}
+        emissive="#8B0000"
+        emissiveIntensity={0.5}
+      />
     </instancedMesh>
   );
 };
@@ -170,21 +254,27 @@ const AnimatedSpotlights = () => {
 const Scene = () => {
   return (
     <>
-      <ambientLight intensity={0.2} />
+      {/* Lights */}
       <AnimatedSpotlights />
-      
+      <ambientLight intensity={0.3} />
+      <pointLight position={[10, 10, 10]} intensity={1.2} color="#D4AF37" />
+      <pointLight position={[-10, -10, -10]} intensity={0.8} color="#8B0000" />
+      <pointLight position={[0, 5, 5]} intensity={0.6} color="#FFD700" />
+
+      {/* 3D Elements */}
+      <ScatteringCubes />
+      <ExplodingParticles />
       <Stage />
-      <Confetti />
       
       <Sparkles
-        count={50}
+        count={200}
         scale={15}
         size={2}
         speed={0.3}
         color="#D4AF37"
       />
 
-      <Environment preset="studio" />
+      <Environment preset="night" />
       
       <OrbitControls
         enableZoom={false}

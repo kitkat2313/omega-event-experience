@@ -9,6 +9,9 @@ import { Link } from "react-router-dom";
 import weddingImg from "@/assets/wedding-service.jpg";
 import corporateImg from "@/assets/corporate-service.jpg";
 import birthdayImg from "@/assets/birthday-service.jpg";
+import soundLightingImg from "@/assets/sound-lighting-service.jpg";
+import themeDecorImg from "@/assets/theme-decor-service.jpg";
+import photographyImg from "@/assets/photography-service.jpg";
 
 const services = [
   {
@@ -33,19 +36,19 @@ const services = [
     icon: Music,
     title: "Sound & Lighting",
     description: "Premium audio-visual solutions for immersive event experiences.",
-    image: null,
+    image: soundLightingImg,
   },
   {
     icon: Sparkles,
     title: "Theme Décor",
     description: "Transforming venues with stunning, bespoke decoration concepts.",
-    image: null,
+    image: themeDecorImg,
   },
   {
     icon: Camera,
     title: "Photography",
     description: "Capturing every precious moment with cinematic excellence.",
-    image: null,
+    image: photographyImg,
   },
 ];
 
