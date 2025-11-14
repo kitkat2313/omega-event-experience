@@ -214,9 +214,16 @@ const Contact = () => {
       <Section className="pb-20">
         <div className="container mx-auto px-4">
           <Card className="overflow-hidden glass-strong h-96">
-            <div className="w-full h-full bg-muted/20 flex items-center justify-center">
-              <MapPin className="w-16 h-16 text-primary opacity-50" />
-            </div>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.898425846193!2d77.3410515!3d28.612912599999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce5456ef36d9f%3A0x3b7191b1286136c8!2sNoida%2C%20Uttar%20Pradesh!5e0!3m2!1sen!2sin!4v1234567890123!5m2!1sen!2sin"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Office Location"
+            />
           </Card>
         </div>
       </Section>
